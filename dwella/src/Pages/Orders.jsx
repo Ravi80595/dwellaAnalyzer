@@ -268,6 +268,7 @@ const Orders = () => {
     const [selectedStartDate, setSelectedStartDate] = useState();
     const [selectedEndDate, setSelectedEndDate] = useState();
     const [currentPage, setCurrentPage] = useState(1);
+    const [loading,setLoading]=useState(false)
 
     useEffect(() => {
         fetchAllOrders();
@@ -275,7 +276,7 @@ const Orders = () => {
 
     const fetchAllOrders = async () => {
         try {
-            console.log('loading')
+           setLoading(true)
             const consumerKey = 'ck_808778b85393bf9b62c6c09f2ba1bccadaf083c9';
             const consumerSecret = 'cs_9e199ecb87f812c06fd50dc36f337342c269541c';
             const perPage = 100;
@@ -297,8 +298,10 @@ const Orders = () => {
 
             const data = await response.json();
             setAllOrders(data);
+            setLoading(false)
             organizeOrdersByState(data);
         } catch (error) {
+            setLoading(false)
             console.error('Error fetching orders:', error);
         }
     };
@@ -323,10 +326,10 @@ const Orders = () => {
             <Box p={10} pt={90}>
             <Flex gap={10} alignItems={'right'} mb={2} justifyContent={'end'}>
                             <Button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
-                                Previous Page
+                                Next Page
                             </Button>
                             <span>Page {currentPage}</span>
-                            <Button onClick={() => setCurrentPage(currentPage + 1)}>Next Page</Button>
+                            <Button onClick={() => setCurrentPage(currentPage + 1)}>Previous Page</Button>
                         </Flex>
                 <Flex justifyContent="space-around" gap={20}>
                     <Box w="30%" pt="50px" background={'white'} borderRadius={10} ml={5}>
@@ -340,7 +343,7 @@ const Orders = () => {
                             {selectedEndDate && selectedEndDate.toLocaleDateString('en-US')}
                         </Text> */}
                         <h2>Orders by State and Count</h2>
-                        {Object.entries(ordersByState).map(([state, orders]) => (
+                        {loading?<Text ml={10} fontSize={'22px'} mt={20} mb={250} justifyContent={'center'}>Loading...</Text>:Object.entries(ordersByState).map(([state, orders]) => (
                             <Text key={state}>
                                 {state}: {orders.length} orders
                             </Text>
@@ -358,7 +361,7 @@ const Orders = () => {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {allOrders.map((order) => (
+                                {loading?<Text ml={20} fontSize={'22px'} mt={20} mb={250} justifyContent={'center'}>Loading...</Text>:allOrders.map((order) => (
                                     <Tr fontSize="16px" key={order.id}>
                                         <Td>{++serialNumber}</Td>
                                         <Td>{order.id}</Td>
@@ -372,10 +375,10 @@ const Orders = () => {
                 </Flex>
                 <Flex gap={10} w="30%" m="auto" mt={8} mb={10}>
                     <Button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
-                        Previous Page
+                        Next Page
                     </Button>
                     <span>Page {currentPage}</span>
-                    <Button onClick={() => setCurrentPage(currentPage + 1)}>Next Page</Button>
+                    <Button onClick={() => setCurrentPage(currentPage + 1)}>Previous Page</Button>
                 </Flex>
             </Box>
         </Box>
